@@ -46,7 +46,7 @@ public class ConfigReader {
 	}
 
 	public int getMEMORY_MAX() {
-		return MEMORY_MAX;
+		return this.MEMORY_MAX;
 	}
 
 	public void setMEMORY_MAX(int MEMORY_MAX) {
@@ -54,7 +54,7 @@ public class ConfigReader {
 	}
 
 	public int getPROC_SIZE_MAX() {
-		return PROC_SIZE_MAX;
+		return this.PROC_SIZE_MAX;
 	}
 
 	public void setPROC_SIZE_MAX(int PROC_SIZE_MAX) {
@@ -62,7 +62,7 @@ public class ConfigReader {
 	}
 
 	public int getNUM_PROC() {
-		return NUM_PROC;
+		return this.NUM_PROC;
 	}
 
 	public void setNUM_PROC(int NUM_PROC) {
@@ -70,7 +70,7 @@ public class ConfigReader {
 	}
 
 	public int getMAX_PROC_TIME() {
-		return MAX_PROC_TIME;
+		return this.MAX_PROC_TIME;
 	}
 
 	public void setMAX_PROC_TIME(int MAX_PROC_TIME) {
