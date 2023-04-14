@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-
+//Project 2
 public class ContigousMemoryAllocator {
 	private int size; // maximum memory size in bytes (B)
 	private Map<String, Partition> allocMap; // map process to partition
