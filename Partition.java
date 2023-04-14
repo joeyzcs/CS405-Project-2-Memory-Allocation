@@ -44,11 +44,9 @@ public class Partition {
 	public void setProcess(String process) {
 		this.process = process;
 	}
-	
+
 	public String toString() {
-		return "base=" + base + ", length=" + length + ", bFree=" + bFree + ", process=" +
-				process;
+		return "base=" + base + ", length=" + length + ", bFree=" + bFree + ", process=" + process;
 	}
-	
-	
+
 }
