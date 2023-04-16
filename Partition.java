@@ -15,7 +15,7 @@ public class Partition {
 		this.bFree = true; // free by default when creating
 		this.process = null; // unallocated to any process
 	}
-	
+
 	public Partition(int base, int length, int time) {
 		this.base = base;
 		this.length = length;
@@ -39,7 +39,7 @@ public class Partition {
 	public void setLength(int length) {
 		this.length = length;
 	}
-	
+
 	public int getTime() {
 		return time;
 	}
@@ -47,7 +47,6 @@ public class Partition {
 	public void setTime(int time) {
 		this.time = time;
 	}
-
 
 	public boolean isFree() {
 		return bFree;

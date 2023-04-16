@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 public class ContigousMemoryAllocator {
-	
+
 	private int MAXsize; // maximum memory size in bytes (B)
 
 	public Map<String, Partition> allocMap; // map process to partition
 	private List<Partition> partList; // list of memory partitions
-	
+
 	// constructor
 	public ContigousMemoryAllocator(int size) {
 		this.MAXsize = size;
@@ -18,6 +18,7 @@ public class ContigousMemoryAllocator {
 		this.partList = new ArrayList<>();
 		this.partList.add(new Partition(0, MAXsize)); // add the first hole, which is the whole memory at start up
 	}
+
 	// prints the allocation map (free + allocated) in ascending order of base
 	// addresses
 	public void print_status() {
@@ -142,4 +143,3 @@ public class ContigousMemoryAllocator {
 		}
 	}
 }
-

@@ -1,13 +1,13 @@
 
 public class Process {
-	
+
 	private String name;
 	private int size;
 	private int time;
 	private int startTime;
 	private boolean isAllocated;
 	private boolean isTerminated;
-	
+
 	public Process(String name, int size, int time) {
 		super();
 		this.name = name;
