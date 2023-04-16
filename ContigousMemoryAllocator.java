@@ -21,7 +21,7 @@ public class ContigousMemoryAllocator {
 
 	// prints the allocation map (free + allocated) in ascending order of base
 	// addresses
-	public void print_status() {
+	public void print_status(int sysTime) {
 		// TODO: add code below
 		order_partitions(); // sort list of partitions in ascending order of base addresses
 		System.out.printf("Partitions [Allocated = %d B, Free = %d B]:\n", allocated_memory(), free_memory());
@@ -29,9 +29,12 @@ public class ContigousMemoryAllocator {
 			Partition part = partList.get(i); // get the partition at index i
 			int start = part.getBase();
 			int end = start + part.getLength() - 1;
+			if(part.getStartTime() != sysTime) {
+				part.setRemainingTime(part.getTime() - sysTime*1000);
+			}
 			String status = part.isFree() ? "Free" : part.getProcess() + "(" + part.getRemainingTime() + "ms)";
 			String partSize = "(" + part.getLength() + "B)";
-			System.out.printf("Address [%06d:%06d] %s %s\n", start, end, status, partSize);
+			System.out.printf("Address [%06d:%06d] %s %s\n", start, end, status, partSize);            //NEEDS TIME REMAINING
 		}
 	}
 
@@ -80,7 +83,7 @@ public class ContigousMemoryAllocator {
 		while (index < partList.size()) {
 			Partition part = partList.get(index);
 			if (part.isFree() && part.getLength() >= process.getSize()) {
-				Partition newPart = new Partition(part.getBase(), process.getSize(), process.getTime());
+				Partition newPart = new Partition(part.getBase(), process.getSize(), process.getTime(), sysTime);
 				newPart.setFree(false);
 				newPart.setProcess(process.getName());
 				newPart.setRemainingTime(process.getTime());

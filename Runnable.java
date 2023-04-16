@@ -15,6 +15,7 @@ public class Runnable {
 		int sysTime = 0;
 
 		ConfigReader configReader = new ConfigReader(configPath);
+		System.out.println("---Current Memory Configurations---");
 		System.out.println("MEMORY_MAX = " + configReader.getMEMORY_MAX());
 		System.out.println("PROC_SIZE_MAX = " + configReader.getPROC_SIZE_MAX());
 		System.out.println("NUM_PROC = " + configReader.getNUM_PROC());
@@ -30,16 +31,18 @@ public class Runnable {
 		}
 
 		int remainingProcs = procList.size();
+		
 
 		while (remainingProcs > 0) {
 
-			System.out.println("Press Enter to continue by 1 second");
-
+			System.out.println("\nPress Enter to continue by 1 second\n");
 			scanner.nextLine();
 			sysTime++;
+			
+			
 
 			for (Process p : procList) {
-
+				
 				if (!p.getIsAllocated() && !p.getIsTerminated()) {
 					if (mmu.first_fit(p, sysTime) > 0) {
 						p.setIsAllocated(true);
@@ -56,7 +59,7 @@ public class Runnable {
 					if (mmu.release(p.getName()) > 0) {
 						p.setIsTerminated(true);
 						remainingProcs--;
-						System.out.println("Release memory allocated to process " + p.getName());
+						System.out.println("Release memory allocated to process " + p.getName() + " " + p.getSize() + "B");
 					} else {
 						System.out.println("Process not found!");
 					}
@@ -64,7 +67,8 @@ public class Runnable {
 			}
 
 			System.out.println("System time: " + sysTime + " (seconds)");
-			mmu.print_status();
+			System.out.println("\n---FIRST FIT---\n");
+			mmu.print_status(sysTime);
 		}
 
 		System.out.println("All processes terminated.");

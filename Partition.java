@@ -3,6 +3,7 @@ public class Partition {
 	private int base; // base address
 	private int length; // partition size
 	private int time; // duration that process is in memory
+	private int startTime; // time that a process was started
 	private boolean bFree; // status: free or allocated
 	private String process; // assigned process if allocated
 	private int remainingTime;
@@ -16,12 +17,20 @@ public class Partition {
 		this.process = null; // unallocated to any process
 	}
 
-	public Partition(int base, int length, int time) {
+	public Partition(int base, int length, int time, int startTime) {
 		this.base = base;
 		this.length = length;
 		this.time = time;
 		this.bFree = true; // free by default when creating
 		this.process = null; // unallocated to any process
+	}
+
+	public int getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(int startTime) {
+		this.startTime = startTime;
 	}
 
 	public int getBase() {
