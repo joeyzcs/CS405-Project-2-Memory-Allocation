@@ -6,16 +6,17 @@ import java.util.Map;
 
 public class ContigousMemoryAllocator {
 	
-	private int size; // maximum memory size in bytes (B)
-	private Map<String, Partition> allocMap; // map process to partition
+	private int MAXsize; // maximum memory size in bytes (B)
+
+	public Map<String, Partition> allocMap; // map process to partition
 	private List<Partition> partList; // list of memory partitions
 	
 	// constructor
 	public ContigousMemoryAllocator(int size) {
-		this.size = size;
+		this.MAXsize = size;
 		this.allocMap = new HashMap<>();
 		this.partList = new ArrayList<>();
-		this.partList.add(new Partition(0, size)); // add the first hole, which is the whole memory at start up
+		this.partList.add(new Partition(0, MAXsize)); // add the first hole, which is the whole memory at start up
 	}
 	// prints the allocation map (free + allocated) in ascending order of base
 	// addresses
@@ -27,7 +28,7 @@ public class ContigousMemoryAllocator {
 			Partition part = partList.get(i); // get the partition at index i
 			int start = part.getBase();
 			int end = start + part.getLength() - 1;
-			String status = part.isFree() ? "Free" : part.getProcess();
+			String status = part.isFree() ? "Free" : part.getProcess() + "(" + part.getRemainingTime() + "ms)";
 			String partSize = "(" + part.getLength() + "B)";
 			System.out.printf("Address [%06d:%06d] %s %s\n", start, end, status, partSize);
 		}
@@ -66,37 +67,37 @@ public class ContigousMemoryAllocator {
 				return o1.getBase() - o2.getBase();
 			}
 		});
-
 	}
 
 	// implements the first fit memory allocation algorithm
-	public int first_fit(String process, int size) {
+	public int first_fit(Process process, int sysTime) {
 		// TODO: add code below
-		if (allocMap.containsKey(process)) // make sure process is not allocated before
+		if (allocMap.containsKey(process.getName())) // make sure process is not allocated before
 			return -1; // duplicate process
 		int index = 0;
 		int alloc = -1;
 		while (index < partList.size()) {
 			Partition part = partList.get(index);
-			if (part.isFree() && part.getLength() >= size) {
-				Partition newPart = new Partition(part.getBase(), size);
+			if (part.isFree() && part.getLength() >= process.getSize()) {
+				Partition newPart = new Partition(part.getBase(), process.getSize(), process.getTime());
 				newPart.setFree(false);
-				newPart.setProcess(process);
+				newPart.setProcess(process.getName());
+				newPart.setRemainingTime(process.getTime());
 				partList.add(index, newPart);
-				allocMap.put(process, newPart);
+				allocMap.put(process.getName(), newPart);
+				process.setStartTime(sysTime);
 				// update current part
-				part.setBase(part.getBase() + size);
-				part.setLength(part.getLength() - size);
+				part.setBase(part.getBase() + process.getSize());
+				part.setLength(part.getLength() - process.getSize());
 				if (part.getLength() == 0)
 					partList.remove(part); // remove empty memory hole
-				alloc = size;
+				alloc = process.getSize();
 				break;
 			}
 			index++; // try next hole
 		}
 		return alloc;
 	}
-
 
 	// release the allocated memory of a process
 	public int release(String process) {
