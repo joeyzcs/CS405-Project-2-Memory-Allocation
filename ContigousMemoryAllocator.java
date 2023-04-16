@@ -3,31 +3,20 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 public class ContigousMemoryAllocator {
+	
 	private int size; // maximum memory size in bytes (B)
 	private Map<String, Partition> allocMap; // map process to partition
 	private List<Partition> partList; // list of memory partitions
+	
 	// constructor
-
 	public ContigousMemoryAllocator(int size) {
 		this.size = size;
 		this.allocMap = new HashMap<>();
 		this.partList = new ArrayList<>();
 		this.partList.add(new Partition(0, size)); // add the first hole, which is the whole memory at start up
 	}
-
-	// prints the list of available commands
-	public void print_help_message() {
-		// TODO: add code below
-		System.out.println("RQ <process> <size> to request memory of size for the process");
-		System.out.println("RL <process> to release the memory of the process");
-		System.out.println("STAT to show the memory allocation status");
-		System.out.println("EXIT to exit");
-		System.out.println("HELP to show the available commands");
-	}
-
 	// prints the allocation map (free + allocated) in ascending order of base
 	// addresses
 	public void print_status() {
@@ -108,6 +97,7 @@ public class ContigousMemoryAllocator {
 		return alloc;
 	}
 
+
 	// release the allocated memory of a process
 	public int release(String process) {
 		// TODO: add code below
@@ -150,54 +140,5 @@ public class ContigousMemoryAllocator {
 			i++; // try next partition to merge
 		}
 	}
-
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		System.out.print("Enter the max memory size: ");
-		int size = Integer.parseInt(sc.nextLine());
-		ContigousMemoryAllocator mmu = new ContigousMemoryAllocator(size);
-		String configPath = "src/config.txt";
-		ConfigReader configReader = new ConfigReader(configPath);
-		System.out.println("MEMORY_MAX = " + configReader.getMEMORY_MAX());
-		System.out.println("PROC_SIZE_MAX = " + configReader.getPROC_SIZE_MAX());
-		System.out.println("NUM_PROC = " + configReader.getNUM_PROC());
-		System.out.println("MAX_PROC_TIME = " + configReader.getMAX_PROC_TIME());
-		while (true) {
-			System.out.print("mmu> ");
-			String line = sc.nextLine();
-			String[] arr = line.split(" ");
-			String command = arr[0].toUpperCase();
-			if (command.equals("HELP")) {
-				mmu.print_help_message();
-			} else if (command.equals("EXIT")) {
-				System.out.println("Exit program. Bye");
-				break;
-			} else if (command.equals("STAT")) {
-				mmu.print_status();
-			} else if (command.equals("RQ")) {
-				if (arr.length < 3) {
-					System.out.println("Not enough parameters!");
-					continue;
-				}
-				String process = arr[1];
-				int rqSize = Integer.parseInt(arr[2]);
-				if (mmu.first_fit(process, rqSize) > 0)
-					System.out.println("Allocated " + rqSize + " B to process " + process);
-				else
-					System.out.println("Duplicate process or not enough memory");
-			} else if (command.equals("RL")) {
-				if (arr.length < 2) {
-					System.out.println("Not enough parameters!");
-					continue;
-				}
-				String process = arr[1];
-				if (mmu.release(process) > 0)
-					System.out.println("Successfully released memory for process " + process);
-				else
-					System.out.println("Not found process!");
-			} else {
-				System.out.println("Invalid command!");
-			}
-		}
-	}
 }
+
