@@ -9,12 +9,14 @@ public class ContiguousMemoryAllocator {
 	private int MAXsize; // maximum memory size in bytes (B)
 
 	public Map<String, Partition> allocMap; // map process to partition
+	public Map<String, Partition> allocMap2; // map process to partition
 	private List<Partition> partList; // list of memory partitions
 
 	// constructor
 	public ContiguousMemoryAllocator(int size) {
 		this.MAXsize = size;
 		this.allocMap = new HashMap<>();
+		this.allocMap2 = new HashMap<>();
 		this.partList = new ArrayList<>();
 		this.partList.add(new Partition(0, MAXsize)); // add the first hole, which is the whole memory at start up
 	}
@@ -83,7 +85,7 @@ public class ContiguousMemoryAllocator {
 
 	public int worst_fit(Process process, int sysTime) {
 		// make sure process is not allocated before
-		if (allocMap.containsKey(process.getName())) {
+		if (allocMap2.containsKey(process.getName())) {
 			return -1; // duplicate process
 		}
 		int index = 0;
@@ -105,7 +107,7 @@ public class ContiguousMemoryAllocator {
 			newPart.setStartTime(sysTime);
 			newPart.setRemainingTime(process.getTime());
 			partList.add(partList.indexOf(largestHole), newPart);
-			allocMap.put(process.getName(), newPart);
+			allocMap2.put(process.getName(), newPart);
 			process.setStartTime(sysTime);
 			// update largest hole
 			largestHole.setBase(largestHole.getBase() + process.getSize());
@@ -146,6 +148,7 @@ public class ContiguousMemoryAllocator {
 			}
 			index++; // try next hole
 		}
+		allocMap.clear();
 		return alloc;
 	}
 

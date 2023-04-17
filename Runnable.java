@@ -19,10 +19,6 @@ public class Runnable {
 		List<Process> procList = new ArrayList<>();
 		Random rand = new Random();
 		int sysTime = 0;
-		int remainingProcs;
-		int nextProcessSize = 0;
-		int nextProcessDuration = 0;
-		String nextProcess = "N/A";
 
 		// reads and prints current system configuration
 		ConfigReader configReader = new ConfigReader(configPath);
@@ -43,11 +39,10 @@ public class Runnable {
 					rand.nextInt(configReader.getMAX_PROC_TIME() + 1)));
 		} // end for loop
 
-		 //runFirstFit(procList, mmu, scanner);
-
+		 runFirstFit(procList, mmu, scanner);
 		// runBestFit(procList, mmu, scanner);
-
-		runWorstFit(procList, mmu, scanner);
+		 List<Process> worstList = deepClone(procList);
+		runWorstFit(worstList, mmu, scanner);
 
 	} // end main()
 
@@ -173,6 +168,16 @@ public class Runnable {
 		} // end while(remainingProcs > 0)
 
 		System.out.println("All processes terminated.");
+	}
+	
+	
+	public static List<Process> deepClone(List<Process> originalList) {
+	    List<Process> clonedList = new ArrayList<>();
+	    for (Process process : originalList) {
+	        Process clonedProcess = new Process(process.getName(), process.getSize(), process.getTime());
+	        clonedList.add(clonedProcess);
+	    }
+	    return clonedList;
 	}
 
 } // end Runnable()
