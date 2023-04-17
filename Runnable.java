@@ -39,10 +39,16 @@ public class Runnable {
 					rand.nextInt(configReader.getMAX_PROC_TIME() + 1)));
 		} // end for loop
 
-		 runFirstFit(procList, mmu, scanner);
-		// runBestFit(procList, mmu, scanner);
-		 List<Process> worstList = deepClone(procList);
+		List<Process> firstList = deepClone(procList);
+		List<Process> worstList = deepClone(procList);
+		List<Process> bestList = deepClone(procList);
+
+		
+		runFirstFit(firstList, mmu, scanner);
+		 
 		runWorstFit(worstList, mmu, scanner);
+		
+		//runBestFit(bestList, mmu, scanner);
 
 	} // end main()
 
