@@ -29,12 +29,24 @@ public class ContiguousMemoryAllocator {
 			Partition part = partList.get(i); // get the partition at index i
 			int start = part.getBase();
 			int end = start + part.getLength() - 1;
-			if(part.getStartTime() != sysTime) { //checks to make sure the start time is not this iteration to avoid decreasing time remaining
-				part.setRemainingTime(part.getTime() - sysTime*1000); // subtracts time as 1 second passes
+			if (part.getStartTime() != sysTime) { // checks to make sure the start time is not this iteration to avoid
+													// decreasing time remaining
+				part.setRemainingTime(part.getTime() - sysTime * 1000); // subtracts time as 1 second passes
 			}
-			String status = part.isFree() ? "Free" : part.getProcess() + "(" + part.getRemainingTime() + "ms)"; // sets status variable with remaining time and checks if free
+			String status = part.isFree() ? "Free" : part.getProcess() + "(" + part.getRemainingTime() + "ms)"; // sets
+																												// status
+																												// variable
+																												// with
+																												// remaining
+																												// time
+																												// and
+																												// checks
+																												// if
+																												// free
 			String partSize = "(" + part.getLength() + "B)"; // sets part size
-			System.out.printf("Address [%06d:%06d] %s %s\n", start, end, status, partSize); // print statement displayed to user for each partition
+			System.out.printf("Address [%06d:%06d] %s %s\n", start, end, status, partSize); // print statement displayed
+																							// to user for each
+																							// partition
 		}
 	}
 
@@ -74,41 +86,41 @@ public class ContiguousMemoryAllocator {
 	}
 
 	public int worst_fit(Process process, int sysTime) {
-        // make sure process is not allocated before
-        if (allocMap.containsKey(process.getName())) {
-            return -1; // duplicate process
-        }
-        int index = 0;
-        int alloc = -1;
-        Partition largestHole = null;
-        while (index < partList.size()) {
-            Partition part = partList.get(index);
-            if (part.isFree() && part.getLength() >= process.getSize()) {
-                if (largestHole == null || part.getLength() > largestHole.getLength()) {
-                    largestHole = part; // update largest hole found so far
-                }
-            }
-            index++; // try next hole
-        }
-        if (largestHole != null) {
-            Partition newPart = new Partition(largestHole.getBase(), process.getSize());
-            newPart.setFree(false);
-            newPart.setProcess(process.getName());
-            newPart.setRemainingTime(process.getTime());
-            partList.add(partList.indexOf(largestHole), newPart);
-            allocMap.put(process.getName(), newPart);
-            process.setStartTime(sysTime);
-            // update largest hole
-            largestHole.setBase(largestHole.getBase() + process.getSize());
-            largestHole.setLength(largestHole.getLength() - process.getSize());
-            if (largestHole.getLength() == 0) {
-                partList.remove(largestHole); // remove empty memory hole
-            }
-            alloc = process.getSize();
-        }
-        return alloc;
-    }
-	
+		// make sure process is not allocated before
+		if (allocMap.containsKey(process.getName())) {
+			return -1; // duplicate process
+		}
+		int index = 0;
+		int alloc = -1;
+		Partition largestHole = null;
+		while (index < partList.size()) {
+			Partition part = partList.get(index);
+			if (part.isFree() && part.getLength() >= process.getSize()) {
+				if (largestHole == null || part.getLength() > largestHole.getLength()) {
+					largestHole = part; // update largest hole found so far
+				}
+			}
+			index++; // try next hole
+		}
+		if (largestHole != null) {
+			Partition newPart = new Partition(largestHole.getBase(), process.getSize());
+			newPart.setFree(false);
+			newPart.setProcess(process.getName());
+			newPart.setRemainingTime(process.getTime());
+			partList.add(partList.indexOf(largestHole), newPart);
+			allocMap.put(process.getName(), newPart);
+			process.setStartTime(sysTime);
+			// update largest hole
+			largestHole.setBase(largestHole.getBase() + process.getSize());
+			largestHole.setLength(largestHole.getLength() - process.getSize());
+			if (largestHole.getLength() == 0) {
+				partList.remove(largestHole); // remove empty memory hole
+			}
+			alloc = process.getSize();
+		}
+		return alloc;
+	}
+
 	// implements the first fit memory allocation algorithm
 	public int first_fit(Process process, int sysTime) {
 		// TODO: add code below
@@ -119,7 +131,8 @@ public class ContiguousMemoryAllocator {
 		while (index < partList.size()) { // loops through the partList
 			Partition part = partList.get(index); // stores part variable for each loop iteration
 			if (part.isFree() && part.getLength() >= process.getSize()) {
-				Partition newPart = new Partition(part.getBase(), process.getSize(), process.getTime(), sysTime); // part construction
+				Partition newPart = new Partition(part.getBase(), process.getSize(), process.getTime(), sysTime); // part
+																													// construction
 				newPart.setFree(false); // reserves part
 				newPart.setProcess(process.getName()); // gets the process name associated to part
 				newPart.setRemainingTime(process.getTime()); // initial set remaining time when process starts
@@ -181,4 +194,58 @@ public class ContiguousMemoryAllocator {
 			i++; // try next partition to merge
 		}
 	}
+
+	public int num_holes() {
+		int i = 0;
+		int holes = 0;
+		while (i < partList.size()) {
+			Partition part = partList.get(i);
+			if (part.isFree()) {
+				holes++;
+			}
+			i++;
+		}
+		return holes;
+	} // end num_holes
+
+	public int avg_hole() {
+		int i = 0;
+		int sum = 0; // sum of open space
+		int count = 0; // number of holes
+		while (i < partList.size()) {
+			Partition part = partList.get(i);
+			if (part.isFree()) {
+				sum += part.getLength();
+				count++;
+			}
+			i++;
+		}
+		return sum / count;
+	} // end avg_hole
+
+	public int tot_hole_size() {
+		int i = 0;
+		int sum = 0; // sum of open space
+		while (i < partList.size()) {
+			Partition part = partList.get(i);
+			if (part.isFree()) {
+				sum += part.getLength();
+			}
+			i++;
+		}
+		return sum;
+	} // end tot_hole_size
+
+	public int percent_free() {
+		int i = 0; // number of holes
+		int sum = 0; // sum of not open space
+		while (i < partList.size()) {
+			Partition partI = partList.get(i);
+			if (partI.isFree()) {
+				sum += partI.getLength();
+			}
+			i++;
+		}
+		return (sum * 100) / MAXsize;
+	} // end percent_free
 }
