@@ -43,7 +43,7 @@ public class Runnable {
 					rand.nextInt(configReader.getMAX_PROC_TIME() + 1)));
 		} // end for loop
 
-		// runFirstFit(procList, mmu, scanner);
+		 //runFirstFit(procList, mmu, scanner);
 
 		// runBestFit(procList, mmu, scanner);
 

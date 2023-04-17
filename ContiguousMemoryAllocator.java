@@ -24,7 +24,9 @@ public class ContiguousMemoryAllocator {
 	public void print_status(int sysTime) {
 		// TODO: add code below
 		order_partitions(); // sort list of partitions in ascending order of base addresses
-		System.out.printf("Partitions [Allocated = %d B, Free = %d B]:\n", allocated_memory(), free_memory());
+		System.out.printf(
+				"Partitions [Allocated = %dB, Free = %dB, Holes = %d, AVG Hole = %dB, Total Size Hole = %dB, Percent of free memory = %d%%]:\n\n",
+				allocated_memory(), free_memory(), num_holes(), avg_hole(), tot_hole_size(), percent_free());
 		for (int i = 0; i < partList.size(); i++) {
 			Partition part = partList.get(i); // get the partition at index i
 			int start = part.getBase();
@@ -37,16 +39,10 @@ public class ContiguousMemoryAllocator {
 																												// status
 																												// variable
 																												// with
-																												// remaining
-																												// time
-																												// and
-																												// checks
 																												// if
 																												// free
 			String partSize = "(" + part.getLength() + "B)"; // sets part size
-			System.out.printf("Address [%06d:%06d] %s %s\n", start, end, status, partSize); // print statement displayed
-																							// to user for each
-																							// partition
+			System.out.printf("Address [%06d:%06d] %s %s\n", start, end, status, partSize);
 		}
 	}
 
@@ -103,9 +99,10 @@ public class ContiguousMemoryAllocator {
 			index++; // try next hole
 		}
 		if (largestHole != null) {
-			Partition newPart = new Partition(largestHole.getBase(), process.getSize());
+			Partition newPart = new Partition(largestHole.getBase(), process.getSize(), process.getTime(), sysTime);
 			newPart.setFree(false);
 			newPart.setProcess(process.getName());
+			newPart.setStartTime(sysTime);
 			newPart.setRemainingTime(process.getTime());
 			partList.add(partList.indexOf(largestHole), newPart);
 			allocMap.put(process.getName(), newPart);
@@ -151,6 +148,15 @@ public class ContiguousMemoryAllocator {
 		}
 		return alloc;
 	}
+
+//	public int best_fit(Process process, int sysTime) {
+//		if(allocMap.containsKey(process.getName())) {
+//			return -1;
+//		}
+//		int index = 0;
+//		int alloc = 1;
+//		Partition bestHole = null;
+//	}
 
 	// release the allocated memory of a process
 	public int release(String process) {
