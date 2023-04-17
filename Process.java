@@ -15,10 +15,19 @@ public class Process {
 		this.name = name;
 		this.size = size;
 		this.time = time;
+		this.isAllocated = false;
+		this.isTerminated = false;
 		this.startTime = -1;
 	}
 
 	
+	@Override
+	public String toString() {
+		return "Process [name=" + name + ", size=" + size + ", time=" + time + ", startTime=" + startTime
+				+ ", isAllocated=" + isAllocated + ", isTerminated=" + isTerminated + "]";
+	}
+
+
 	// getters and setters
 	public int getStartTime() {
 		return startTime;
