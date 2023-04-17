@@ -73,6 +73,42 @@ public class ContiguousMemoryAllocator {
 		});
 	}
 
+	public int worst_fit(Process process, int sysTime) {
+        // make sure process is not allocated before
+        if (allocMap.containsKey(process.getName())) {
+            return -1; // duplicate process
+        }
+        int index = 0;
+        int alloc = -1;
+        Partition largestHole = null;
+        while (index < partList.size()) {
+            Partition part = partList.get(index);
+            if (part.isFree() && part.getLength() >= process.getSize()) {
+                if (largestHole == null || part.getLength() > largestHole.getLength()) {
+                    largestHole = part; // update largest hole found so far
+                }
+            }
+            index++; // try next hole
+        }
+        if (largestHole != null) {
+            Partition newPart = new Partition(largestHole.getBase(), process.getSize());
+            newPart.setFree(false);
+            newPart.setProcess(process.getName());
+            newPart.setRemainingTime(process.getTime());
+            partList.add(partList.indexOf(largestHole), newPart);
+            allocMap.put(process.getName(), newPart);
+            process.setStartTime(sysTime);
+            // update largest hole
+            largestHole.setBase(largestHole.getBase() + process.getSize());
+            largestHole.setLength(largestHole.getLength() - process.getSize());
+            if (largestHole.getLength() == 0) {
+                partList.remove(largestHole); // remove empty memory hole
+            }
+            alloc = process.getSize();
+        }
+        return alloc;
+    }
+	
 	// implements the first fit memory allocation algorithm
 	public int first_fit(Process process, int sysTime) {
 		// TODO: add code below

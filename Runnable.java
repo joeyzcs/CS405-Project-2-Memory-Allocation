@@ -43,13 +43,11 @@ public class Runnable {
 					rand.nextInt(configReader.getMAX_PROC_TIME() + 1)));
 		} // end for loop
 
-		runFirstFit(procList, mmu, scanner);
+		//runFirstFit(procList, mmu, scanner);
 
-		System.out.println("All processes terminated.");
+		// runBestFit(procList, mmu, scanner);
 
-		// runBestCase(procList, mmu, scanner);
-
-		// runWorstCase(procList, mmu, scanner);
+		runWorstFit(procList, mmu, scanner);
 
 	} // end main()
 
@@ -117,8 +115,64 @@ public class Runnable {
 //
 //	}
 //
-//	private static void runWorstFit(List<Process> procList, ContiguousMemoryAllocator mmu, Scanner scanner) {
-//
-//	}
+	private static void runWorstFit(List<Process> procList, ContiguousMemoryAllocator mmu, Scanner scanner) {
+		int sysTime = 0;
+		int remainingProcs = procList.size();
+		int nextProcessSize = 0;
+		int nextProcessDuration = 0;
+		String nextProcess = "N/A";
+
+		System.out.println("System Time: " + sysTime);
+		System.out.println("\n---WORST FIT---\n");
+
+		while (remainingProcs > 0) {
+			System.out.println("\nPress Enter to continue by 1 second(1000ms).\n");
+			scanner.nextLine();
+			sysTime++;
+
+			for (Process p : procList) {
+
+				if (!p.getIsAllocated() && !p.getIsTerminated()) {
+					if (mmu.worst_fit(p, sysTime) > 0) {
+						p.setIsAllocated(true);
+						System.out.println("Allocated " + p.getSize() + "B to process " + p.getName());
+					} else {
+						System.out.println("Unable to allocate: " + p.getName());
+					} // end conditional
+				} // end conditional
+
+			} // end for loop
+
+			for (Process p : procList) {
+				if (p.getIsAllocated() && !p.getIsTerminated() && p.getStartTime() + p.getTime() <= (sysTime * 1000)) {
+					if (mmu.release(p.getName()) > 0) {
+						p.setIsTerminated(true);
+						remainingProcs--;
+						System.out.println(
+								"Release memory allocated to process " + p.getName() + " " + p.getSize() + "B");
+						mmu.merge_holes();
+					} else {
+						System.out.println("Process not found!");
+					} // end conditional
+				} // end conditional
+			} // end for loop
+
+			for (Process p : procList) {
+				if (!p.getIsTerminated() && p.getStartTime() == -1) {
+					nextProcess = p.getName();
+					nextProcessSize = p.getSize();
+					nextProcessDuration = p.getSize();
+					break;
+				}
+			}
+			System.out.print("\nNext Process to be allocated: " + nextProcess + " " + nextProcessSize + "B - "
+					+ nextProcessDuration + "ms");
+			System.out.println("\nSystem time: " + sysTime + " (seconds)");
+			System.out.println("\n---WORST FIT---\n");
+			mmu.print_status(sysTime);
+		} // end while(remainingProcs > 0)
+
+		System.out.println("All processes terminated.");
+	}
 
 } // end Runnable()
