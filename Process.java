@@ -1,6 +1,7 @@
 
 public class Process {
 
+	// declare variables
 	private String name;
 	private int size;
 	private int time;
@@ -8,6 +9,7 @@ public class Process {
 	private boolean isAllocated;
 	private boolean isTerminated;
 
+	// constructor
 	public Process(String name, int size, int time) {
 		super();
 		this.name = name;
@@ -16,6 +18,8 @@ public class Process {
 		this.startTime = -1;
 	}
 
+	
+	// getters and setters
 	public int getStartTime() {
 		return startTime;
 	}
