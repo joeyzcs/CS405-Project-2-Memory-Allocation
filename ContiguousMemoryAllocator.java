@@ -9,14 +9,12 @@ public class ContiguousMemoryAllocator {
 	private int MAXsize; // maximum memory size in bytes (B)
 
 	public Map<String, Partition> allocMap; // map process to partition
-	public Map<String, Partition> allocMap2; // map process to partition
 	private List<Partition> partList; // list of memory partitions
 
 	// constructor
 	public ContiguousMemoryAllocator(int size) {
 		this.MAXsize = size;
 		this.allocMap = new HashMap<>();
-		this.allocMap2 = new HashMap<>();
 		this.partList = new ArrayList<>();
 		this.partList.add(new Partition(0, MAXsize)); // add the first hole, which is the whole memory at start up
 	}
@@ -34,8 +32,8 @@ public class ContiguousMemoryAllocator {
 			int start = part.getBase();
 			int end = start + part.getLength() - 1;
 			if (part.getStartTime() != sysTime) { // checks to make sure the start time is not this iteration to avoid
-													// decreasing time remaining
-				part.setRemainingTime(part.getTime() - sysTime * 1000); // subtracts time as 1 second passes
+											      // decreasing time remaining
+				part.setRemainingTime(part.getTime() - (sysTime-1) * 1000); // subtracts time as 1 second passes
 			}
 			String status = part.isFree() ? "Free" : part.getProcess() + "(" + part.getRemainingTime() + "ms)"; // sets
 																												// status
@@ -85,7 +83,7 @@ public class ContiguousMemoryAllocator {
 
 	public int worst_fit(Process process, int sysTime) {
 		// make sure process is not allocated before
-		if (allocMap2.containsKey(process.getName())) {
+		if (allocMap.containsKey(process.getName())) {
 			return -1; // duplicate process
 		}
 		int index = 0;
@@ -107,7 +105,7 @@ public class ContiguousMemoryAllocator {
 			newPart.setStartTime(sysTime);
 			newPart.setRemainingTime(process.getTime());
 			partList.add(partList.indexOf(largestHole), newPart);
-			allocMap2.put(process.getName(), newPart);
+			allocMap.put(process.getName(), newPart);
 			process.setStartTime(sysTime);
 			// update largest hole
 			largestHole.setBase(largestHole.getBase() + process.getSize());
@@ -117,6 +115,7 @@ public class ContiguousMemoryAllocator {
 			}
 			alloc = process.getSize();
 		}
+		allocMap.clear();
 		return alloc;
 	}
 
@@ -151,6 +150,44 @@ public class ContiguousMemoryAllocator {
 		allocMap.clear();
 		return alloc;
 	}
+	
+	public int best_fit(Process process, int sysTime) {
+        // make sure process is not allocated before
+        if (allocMap.containsKey(process.getName())) {
+            return -1; // duplicate process
+        }
+        int index = 0;
+        int alloc = -1;
+        Partition bestHole = null;
+        while (index < partList.size()) {
+            Partition part = partList.get(index);
+            if (part.isFree() && part.getLength() >= process.getSize()) {
+                if (bestHole == null || part.getLength() < bestHole.getLength()) {
+                    bestHole = part; // update best hole found so far
+                }
+            }
+            index++; // try next hole
+        }
+        if (bestHole != null) {
+            Partition newPart = new Partition(bestHole.getBase(), process.getSize(), process.getTime(), sysTime);
+            newPart.setFree(false);
+            newPart.setProcess(process.getName());
+            newPart.setStartTime(sysTime);
+            newPart.setRemainingTime(process.getTime());
+            partList.add(partList.indexOf(bestHole), newPart);
+            allocMap.put(process.getName(), newPart);
+            process.setStartTime(sysTime);
+            // update best hole
+            bestHole.setBase(bestHole.getBase() + process.getSize());
+            bestHole.setLength(bestHole.getLength() - process.getSize());
+            if (bestHole.getLength() == 0) {
+                partList.remove(bestHole); // remove empty memory hole
+            }
+            alloc = process.getSize();
+        }
+        allocMap.clear();
+        return alloc;
+    }
 
 //	public int best_fit(Process process, int sysTime) {
 //		if(allocMap.containsKey(process.getName())) {
