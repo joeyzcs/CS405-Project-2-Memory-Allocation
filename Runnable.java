@@ -19,7 +19,10 @@ public class Runnable {
 		Random rand = new Random();
 		int sysTime = 0;
 		int remainingProcs;
+		int nextProcessSize = 0;
+		int nextProcessDuration = 0;
 		String nextProcess = "N/A";
+
 
 		// reads and prints current system configuration
 		ConfigReader configReader = new ConfigReader(configPath);
@@ -68,6 +71,7 @@ public class Runnable {
 						p.setIsTerminated(true);
 						remainingProcs--;
 						System.out.println("Release memory allocated to process " + p.getName() + " " + p.getSize() + "B");
+						mmu.merge_holes();
 					} else {
 						System.out.println("Process not found!");
 					} //end conditional
@@ -77,10 +81,12 @@ public class Runnable {
 			for (Process p : procList) {
 				if(!p.getIsTerminated() && p.getStartTime() == -1) {
 					nextProcess = p.getName();
+					nextProcessSize = p.getSize();
+					nextProcessDuration = p.getSize();
 					break;
 				}
 			}
-			System.out.print("\nNext Process to be allocated: " + nextProcess);
+			System.out.print("\nNext Process to be allocated: " + nextProcess + " " + nextProcessSize + "B - " + nextProcessDuration + "ms" );
 			System.out.println("\nSystem time: " + sysTime + " (seconds)");
 			System.out.println("\n---FIRST FIT---\n");
 			mmu.print_status(sysTime);

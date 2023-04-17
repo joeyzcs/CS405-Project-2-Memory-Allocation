@@ -122,7 +122,7 @@ public class ContiguousMemoryAllocator {
 	}
 
 	// procedure to merge adjacent holes
-	private void merge_holes() {
+	void merge_holes() {
 		// TODO: add code below
 		order_partitions();
 		int i = 0;
