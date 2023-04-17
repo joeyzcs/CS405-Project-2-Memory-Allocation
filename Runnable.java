@@ -19,6 +19,7 @@ public class Runnable {
 		Random rand = new Random();
 		int sysTime = 0;
 		int remainingProcs;
+		String nextProcess = "N/A";
 
 		// reads and prints current system configuration
 		ConfigReader configReader = new ConfigReader(configPath);
@@ -73,6 +74,13 @@ public class Runnable {
 				} //end conditional
 			} //end for loop
 
+			for (Process p : procList) {
+				if(!p.getIsTerminated() && p.getStartTime() == -1) {
+					nextProcess = p.getName();
+					break;
+				}
+			}
+			System.out.print("\nNext Process to be allocated: " + nextProcess);
 			System.out.println("\nSystem time: " + sysTime + " (seconds)");
 			System.out.println("\n---FIRST FIT---\n");
 			mmu.print_status(sysTime);
